@@ -1,5 +1,6 @@
 package com.madejamaciej.planer;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,13 +26,26 @@ public class MainActivity extends AppCompatActivity {
         mMonth = calendar.get(Calendar.MONTH);
         mDay = calendar.get(Calendar.DAY_OF_MONTH);
         displayDateInfo(mYear, mMonth, mDay);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+
+                view.setDate(calendar.getTimeInMillis());
+
+                mYear = year;
+                mMonth = month;
+                mDay = dayOfMonth;
+
+                displayDateInfo(mYear, mMonth, mDay);
+            }
+        });
     }
 
     private void displayDateInfo(int year, int month, int day){
+        Log.d("Date changed: ", day+" "+month+" "+ year);
 
-    }
-
-    public void chooseDate(View view) {
-
+        
     }
 }
