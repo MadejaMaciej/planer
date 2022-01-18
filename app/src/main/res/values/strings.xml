@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Planner</string>
+    <string name="button_modify">Modify Tasks</string>
 </resources>
