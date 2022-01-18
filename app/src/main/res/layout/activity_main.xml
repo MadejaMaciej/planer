@@ -19,9 +19,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
-
-
     </RelativeLayout>
 
     <ImageButton
@@ -36,6 +33,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/add_task"
         tools:ignore="SpeakableTextPresentCheck"
-        tools:srcCompat="@drawable/add_task" />
+        tools:srcCompat="@drawable/add_task"
+        android:onClick="addTask"/>
+
 </android.support.constraint.ConstraintLayout>
 

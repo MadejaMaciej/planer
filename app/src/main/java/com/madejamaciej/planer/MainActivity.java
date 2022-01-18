@@ -45,7 +45,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayDateInfo(int year, int month, int day){
         Log.d("Date changed: ", day+" "+month+" "+ year);
+    }
 
-        
+    private void LoadAllTasks() {
+
+    }
+
+    public void addTask(View view) {
+        Log.d("Adding task:", "Changing View");
     }
 }
