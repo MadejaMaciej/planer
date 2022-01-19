@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.madejamaciej.planer">
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/main_icon"
@@ -8,6 +9,9 @@
         android:roundIcon="@mipmap/main_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Planer">
+        <activity
+            android:name=".AddTaskToDay"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

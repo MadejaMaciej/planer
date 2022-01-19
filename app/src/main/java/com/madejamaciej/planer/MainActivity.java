@@ -1,5 +1,6 @@
 package com.madejamaciej.planer;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void DisplayDateInfo(int year, int month, int day) throws JSONException {
+    public void DisplayDateInfo(int year, int month, int day) throws JSONException {
         dayTasks = LoadTasksForDay(year, month, day);
         relativeCheckboxes.removeAllViews();
         if(dayTasks != null){
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void finishTask(String text, String filename) throws IOException {
+    public void finishTask(String text, String filename) throws IOException {
         try{
             File f = new File(getApplicationContext().getFilesDir(), filename);
             FileWriter fileWriter = new FileWriter(f);
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e) {}
     }
 
-    private JSONObject LoadTasksForDay(int year, int month, int day) {
+    public JSONObject LoadTasksForDay(int year, int month, int day) {
         tasks = getJsonFromAssets("tasks.json");
         JSONObject tasksObject = null;
         try{
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private void CreateEmptyFile(String filename) {
+    public void CreateEmptyFile(String filename) {
         try{
             File f = new File(getApplicationContext().getFilesDir(), filename);
             f.createNewFile();
@@ -152,7 +153,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void AddTask(View view) {
-
+        Intent myIntent = new Intent(this, AddTaskToDay.class);
+        myIntent.putExtra("day", mDay);
+        myIntent.putExtra("month", mMonth);
+        myIntent.putExtra("year", mYear);
+        this.startActivity(myIntent);
     }
 
     public int getRandomNumber(int min, int max) {
@@ -160,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String getJsonFromAssets(String fileName) {
+    public String getJsonFromAssets(String fileName) {
         String jsonString;
         InputStream inputStream = null;
         try {
@@ -174,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         return jsonString;
     }
 
-    private String readFromInputStream(InputStream inputStream)
+    public String readFromInputStream(InputStream inputStream)
             throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
         try (BufferedReader br
