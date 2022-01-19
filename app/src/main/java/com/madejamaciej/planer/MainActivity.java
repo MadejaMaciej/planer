@@ -68,7 +68,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void DisplayDateInfo(int year, int month, int day) throws JSONException {
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        try{
+            DisplayDateInfo(mYear, mMonth, mDay);
+        }catch(JSONException e){}
+    }
+
+    private void DisplayDateInfo(int year, int month, int day) throws JSONException {
         dayTasks = LoadTasksForDay(year, month, day);
         relativeCheckboxes.removeAllViews();
         if(dayTasks != null){
@@ -105,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void finishTask(String text, String filename) throws IOException {
+    private void finishTask(String text, String filename) throws IOException {
         try{
             File f = new File(getApplicationContext().getFilesDir(), filename);
             FileWriter fileWriter = new FileWriter(f);
@@ -121,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e) {}
     }
 
-    public JSONObject LoadTasksForDay(int year, int month, int day) {
+    private JSONObject LoadTasksForDay(int year, int month, int day) {
         tasks = getJsonFromAssets("tasks.json");
         JSONObject tasksObject = null;
         try{
@@ -134,19 +142,13 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public void CreateEmptyFile(String filename) {
+    private void CreateEmptyFile(String filename) {
         try{
             File f = new File(getApplicationContext().getFilesDir(), filename);
             f.createNewFile();
             FileWriter fileWriter = new FileWriter(f);
-            JSONObject dataObj = new JSONObject();
-            JSONObject taskObj = new JSONObject();
-            taskObj.put("Task Name", false);
-            dataObj.put("task-"+mDay+"-"+mMonth+"-"+mYear, taskObj);
-            JSONObject newObj = (JSONObject) dataObj.get("task-"+mDay+"-"+mMonth+"-"+mYear);
-            newObj.put("New Task 2", true);
-            dataObj.put("task-"+mDay+"-"+mMonth+"-"+mYear, newObj);
-            fileWriter.write(dataObj.toString());
+            JSONObject startingJson = new JSONObject();
+            fileWriter.write(startingJson.toString());
             fileWriter.flush();
             fileWriter.close();
         }catch (Exception e){ }
@@ -160,12 +162,12 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(myIntent);
     }
 
-    public int getRandomNumber(int min, int max) {
+    private int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
 
 
-    public String getJsonFromAssets(String fileName) {
+    private String getJsonFromAssets(String fileName) {
         String jsonString;
         InputStream inputStream = null;
         try {
@@ -179,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         return jsonString;
     }
 
-    public String readFromInputStream(InputStream inputStream)
+    private String readFromInputStream(InputStream inputStream)
             throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
         try (BufferedReader br
@@ -192,13 +194,3 @@ public class MainActivity extends AppCompatActivity {
         return resultStringBuilder.toString();
     }
 }
-
-//putting new task
-//JSONObject dataObj = new JSONObject();
-//JSONObject taskObj = new JSONObject();
-//taskObj.put("Task Name", false);
-//dataObj.put("task-"+mDay+"-"+mMonth+"-"+mYear, taskObj);
-//JSONObject newObj = (JSONObject) dataObj.get("task-"+mDay+"-"+mMonth+"-"+mYear);
-//newObj.put("New Task 2", true);
-//dataObj.put("task-"+mDay+"-"+mMonth+"-"+mYear, newObj);
-//fileWriter.write(dataObj.toString());
