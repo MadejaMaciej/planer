@@ -58,9 +58,11 @@ public class AddTaskToDay extends AppCompatActivity {
 
     public void TaskDayAddition(View view) {
         String newTaskName = edit.getText().toString();
-        try{
-            AddTasks(newTaskName, "tasks.json");
-        } catch(IOException e){}
+        if(!newTaskName.equals("")){
+            try{
+                AddTasks(newTaskName, "tasks.json");
+            } catch(IOException e){}
+        }
 
         edit.setText("");
     }

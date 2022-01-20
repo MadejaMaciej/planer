@@ -32,16 +32,21 @@
             tools:text="Done | Task"
             android:textFontWeight="900"/>
 
-        <RelativeLayout
-            android:id="@+id/relativeCheckboxes"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/data"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp">
+            <RelativeLayout
+                android:id="@+id/relativeCheckboxes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        </RelativeLayout>
+            </RelativeLayout>
+        </ScrollView>
+
 
     </RelativeLayout>
 
