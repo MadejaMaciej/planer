@@ -4,9 +4,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/main_icon"
+        android:icon="@mipmap/free_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/main_icon_round"
+        android:roundIcon="@mipmap/free_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Planer">
         <activity
