@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Your Planner</string>
+    <string name="app_name">Planner</string>
     <string name="button_modify">Modify Tasks</string>
     <string name="done_task">Done | Task</string>
     <string name="add_task">Add Task</string>
