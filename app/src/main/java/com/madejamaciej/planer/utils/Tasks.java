@@ -1,4 +1,4 @@
-package com.madejamaciej.planer;
+package com.madejamaciej.planer.utils;
 
 import android.app.Activity;
 import android.content.Context;
