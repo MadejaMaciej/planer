@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -119,7 +120,10 @@ public class AddTaskToDay extends AppCompatActivity {
             while(keys.hasNext()) {
                 String key = keys.next();
                 boolean value = (boolean) dayTasks.get(key);
-                CheckBox cb = new CheckBox(getApplicationContext());
+                LinearLayout ll = new LinearLayout(this);
+                ll.setOrientation(LinearLayout.HORIZONTAL);
+                relativeCheckboxes.addView(ll);
+                CheckBox cb = new CheckBox(this);
                 cb.setText(key);
                 cb.setChecked(value);
                 cb.setId(getRandomNumber(10000000, 999999999));
@@ -127,21 +131,37 @@ public class AddTaskToDay extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         CheckBox cb = (CheckBox) findViewById(v.getId());
+                        boolean isChecked = cb.isChecked();
                         if(cb != null){
-                            cb.setClickable(false);
                             String text = (String) cb.getText();
-                            try {
-                                finishTask(text, "tasks.json");
-                            } catch (IOException e) { }
+                            if(isChecked){
+                                try {
+                                    finishTask(text, "tasks.json");
+                                } catch (IOException e) { }
+                            }else{
+                                try {
+                                    unfinishTask(text, "tasks.json");
+                                } catch (IOException e) { }
+                            }
+
                         }
                     }
                 });
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                Button edit = new Button(this);
+                edit.setText("Edit");
+                edit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.topMargin = 100*iterator;
-                if(value){
-                    cb.setClickable(false);
-                }
-                relativeCheckboxes.addView(cb, params);
+                ll.addView(cb, params);
+                LinearLayout.LayoutParams paramsBtn = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                paramsBtn.topMargin = 100*iterator;
+//                ll.addView(edit, paramsBtn);
                 iterator++;
             }
         }
@@ -154,6 +174,22 @@ public class AddTaskToDay extends AppCompatActivity {
             JSONObject tasksObject = new JSONObject(tasks);
             tasksObject = tasksObject.getJSONObject("task-"+mDay+"-"+mMonth+"-"+mYear);
             tasksObject.put(text, true);
+            JSONObject wholePlanner = new JSONObject(tasks);
+            wholePlanner.put("task-"+mDay+"-"+mMonth+"-"+mYear, tasksObject);
+            fileWriter.write(wholePlanner.toString());
+            fileWriter.flush();
+            fileWriter.close();
+            tasks = wholePlanner.toString();
+        }catch (Exception e) {}
+    }
+
+    private void unfinishTask(String text, String filename) throws IOException {
+        try{
+            File f = new File(getApplicationContext().getFilesDir(), filename);
+            FileWriter fileWriter = new FileWriter(f);
+            JSONObject tasksObject = new JSONObject(tasks);
+            tasksObject = tasksObject.getJSONObject("task-"+mDay+"-"+mMonth+"-"+mYear);
+            tasksObject.put(text, false);
             JSONObject wholePlanner = new JSONObject(tasks);
             wholePlanner.put("task-"+mDay+"-"+mMonth+"-"+mYear, tasksObject);
             fileWriter.write(wholePlanner.toString());
