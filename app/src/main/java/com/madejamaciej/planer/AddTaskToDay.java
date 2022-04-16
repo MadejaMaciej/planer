@@ -1,5 +1,7 @@
 package com.madejamaciej.planer;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,13 +32,13 @@ public class AddTaskToDay extends AppCompatActivity {
     int mDay;
     EditText edit;
     File file;
-    String tasks;
-    JSONObject dayTasks;
+    Activity that;
     RelativeLayout relativeCheckboxes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        that = this;
         setContentView(R.layout.activity_add_task_to_day);
         Intent intent = getIntent();
         mYear = intent.getIntExtra("year", 2022);
@@ -47,7 +49,7 @@ public class AddTaskToDay extends AppCompatActivity {
         file = new File(getApplicationContext().getFilesDir(),"tasks.json");
         relativeCheckboxes = (RelativeLayout) findViewById(R.id.relativeCheckboxes);
         try {
-            DisplayDateInfo(mYear, mMonth, mDay);
+            Tasks.DisplayDateInfo(mYear, mMonth, mDay, relativeCheckboxes, getApplicationContext(), that);
         } catch (JSONException e) { }
     }
 
@@ -61,187 +63,10 @@ public class AddTaskToDay extends AppCompatActivity {
         String newTaskName = edit.getText().toString();
         if(!newTaskName.equals("")){
             try{
-                AddTasks(newTaskName, "tasks.json");
+                Tasks.AddTasks(newTaskName, "tasks.json", mDay, mMonth, mYear, this, relativeCheckboxes, that);
             } catch(IOException e){}
         }
 
         edit.setText("");
     }
-
-    private void AddTasks(String task, String filename) throws IOException {
-        try{
-            File f = new File(getApplicationContext().getFilesDir(), filename);
-            FileWriter fileWriter = new FileWriter(f);
-            JSONObject tasksObject;
-            JSONObject wholePlanner;
-            if(tasks != null){
-                tasksObject = new JSONObject(tasks);
-            }else{
-                tasksObject = new JSONObject();
-            }
-            if(tasksObject.has("task-"+mDay+"-"+mMonth+"-"+mYear)){
-                tasksObject = tasksObject.getJSONObject("task-"+mDay+"-"+mMonth+"-"+mYear);
-                tasksObject.put(task, false);
-                if(tasks != null){
-                    wholePlanner = new JSONObject(tasks);
-                }else {
-                    wholePlanner = new JSONObject();
-                }
-                wholePlanner.put("task-"+mDay+"-"+mMonth+"-"+mYear, tasksObject);
-            }else{
-                tasksObject = new JSONObject();
-                tasksObject.put(task, false);
-                if(tasks != null){
-                    wholePlanner = new JSONObject(tasks);
-                }else {
-                    wholePlanner = new JSONObject();
-                }
-                wholePlanner.put("task-"+mDay+"-"+mMonth+"-"+mYear, tasksObject);
-            }
-            fileWriter.write(wholePlanner.toString());
-            fileWriter.flush();
-            fileWriter.close();
-
-        }catch(JSONException e){
-            Log.e("error", e.toString());
-        }
-
-        try {
-            DisplayDateInfo(mYear, mMonth, mDay);
-        } catch (JSONException e) { }
-    }
-
-    private void DisplayDateInfo(int year, int month, int day) throws JSONException {
-        dayTasks = LoadTasksForDay(year, month, day);
-        relativeCheckboxes.removeAllViews();
-        if(dayTasks != null){
-            int iterator = 0;
-            Iterator<String> keys = dayTasks.keys();
-            while(keys.hasNext()) {
-                String key = keys.next();
-                boolean value = (boolean) dayTasks.get(key);
-                LinearLayout ll = new LinearLayout(this);
-                ll.setOrientation(LinearLayout.HORIZONTAL);
-                relativeCheckboxes.addView(ll);
-                CheckBox cb = new CheckBox(this);
-                cb.setText(key);
-                cb.setChecked(value);
-                cb.setId(getRandomNumber(10000000, 999999999));
-                cb.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        CheckBox cb = (CheckBox) findViewById(v.getId());
-                        boolean isChecked = cb.isChecked();
-                        if(cb != null){
-                            String text = (String) cb.getText();
-                            if(isChecked){
-                                try {
-                                    finishTask(text, "tasks.json");
-                                } catch (IOException e) { }
-                            }else{
-                                try {
-                                    unfinishTask(text, "tasks.json");
-                                } catch (IOException e) { }
-                            }
-
-                        }
-                    }
-                });
-
-                Button edit = new Button(this);
-                edit.setText("Edit");
-                edit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.topMargin = 100*iterator;
-                ll.addView(cb, params);
-                LinearLayout.LayoutParams paramsBtn = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsBtn.topMargin = 100*iterator;
-//                ll.addView(edit, paramsBtn);
-                iterator++;
-            }
-        }
-    }
-
-    private void finishTask(String text, String filename) throws IOException {
-        try{
-            File f = new File(getApplicationContext().getFilesDir(), filename);
-            FileWriter fileWriter = new FileWriter(f);
-            JSONObject tasksObject = new JSONObject(tasks);
-            tasksObject = tasksObject.getJSONObject("task-"+mDay+"-"+mMonth+"-"+mYear);
-            tasksObject.put(text, true);
-            JSONObject wholePlanner = new JSONObject(tasks);
-            wholePlanner.put("task-"+mDay+"-"+mMonth+"-"+mYear, tasksObject);
-            fileWriter.write(wholePlanner.toString());
-            fileWriter.flush();
-            fileWriter.close();
-            tasks = wholePlanner.toString();
-        }catch (Exception e) {}
-    }
-
-    private void unfinishTask(String text, String filename) throws IOException {
-        try{
-            File f = new File(getApplicationContext().getFilesDir(), filename);
-            FileWriter fileWriter = new FileWriter(f);
-            JSONObject tasksObject = new JSONObject(tasks);
-            tasksObject = tasksObject.getJSONObject("task-"+mDay+"-"+mMonth+"-"+mYear);
-            tasksObject.put(text, false);
-            JSONObject wholePlanner = new JSONObject(tasks);
-            wholePlanner.put("task-"+mDay+"-"+mMonth+"-"+mYear, tasksObject);
-            fileWriter.write(wholePlanner.toString());
-            fileWriter.flush();
-            fileWriter.close();
-            tasks = wholePlanner.toString();
-        }catch (Exception e) {}
-    }
-
-    private JSONObject LoadTasksForDay(int year, int month, int day) {
-        tasks = getJsonFromAssets("tasks.json");
-        JSONObject tasksObject = null;
-        try{
-            tasksObject = new JSONObject(tasks);
-            tasksObject = tasksObject.getJSONObject("task-"+day+"-"+month+"-"+year);
-        }catch (Exception e) { return null; }
-        if(tasksObject != null){
-            return tasksObject;
-        }
-        return null;
-    }
-
-    private int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
-    }
-
-
-    private String getJsonFromAssets(String fileName) {
-        String jsonString;
-        InputStream inputStream = null;
-        try {
-            File f = new File(getApplicationContext().getFilesDir(), fileName);
-            inputStream = new FileInputStream(f);
-            jsonString = readFromInputStream(inputStream);
-        } catch (Exception e) {
-            return null;
-        }
-
-        return jsonString;
-    }
-
-    private String readFromInputStream(InputStream inputStream)
-            throws IOException {
-        StringBuilder resultStringBuilder = new StringBuilder();
-        try (BufferedReader br
-                     = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                resultStringBuilder.append(line).append("\n");
-            }
-        }
-        return resultStringBuilder.toString();
-    }
-
 }
