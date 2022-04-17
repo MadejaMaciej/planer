@@ -3,12 +3,15 @@ package com.madejamaciej.planer.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.madejamaciej.planer.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 public class Tasks {
     public static void DisplayDateInfo(int year, int month, int day, RelativeLayout relativeCheckboxes, Context context, Activity activity) throws JSONException {
@@ -34,7 +38,10 @@ public class Tasks {
                 boolean value = (boolean) dayTasks.get(key);
                 LinearLayout ll = new LinearLayout(context);
                 ll.setOrientation(LinearLayout.HORIZONTAL);
-                relativeCheckboxes.addView(ll);
+                ll.setGravity(LinearLayout.TEXT_ALIGNMENT_CENTER);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.topMargin = 100*iterator;
+                relativeCheckboxes.addView(ll, params);
                 CheckBox cb = new CheckBox(context);
                 cb.setText(key);
                 cb.setChecked(value);
@@ -63,19 +70,23 @@ public class Tasks {
                 });
 
                 Button edit = new Button(context);
-                edit.setText("Edit");
+                edit.setBackground(context.getDrawable(R.drawable.edit_task));
                 edit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
                     }
                 });
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.topMargin = 100*iterator;
-                ll.addView(cb, params);
+                LinearLayout.LayoutParams paramsCB = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                paramsCB.weight = 10;
+                paramsCB.bottomMargin  = 20;
+                ll.addView(cb, paramsCB);
                 LinearLayout.LayoutParams paramsBtn = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsBtn.topMargin = 100*iterator;
-//                ll.addView(edit, paramsBtn);
+                paramsBtn.leftMargin = 20;
+                paramsBtn.height = 70;
+                paramsBtn.gravity = Gravity.CENTER_VERTICAL;
+                paramsBtn.weight = 90;
+                ll.addView(edit, paramsBtn);
                 iterator++;
             }
         }
@@ -123,6 +134,31 @@ public class Tasks {
         try {
             DisplayDateInfo(y, m, d, rc, context, th);
         } catch (JSONException e) { }
+    }
+
+    public static void TransferTasksToCurrentDay() throws IOException {
+        try{
+
+        }catch(Exception e) {}
+    }
+
+    public static void EditTask(String oldTask, String newTask, String filename, boolean finished, Context context, int d, int m, int y) throws IOException {
+        try{
+            String tasks = GetJsonFromAssets(filename, context);
+            File f = new File(context.getFilesDir(), filename);
+            FileWriter fileWriter = new FileWriter(f);
+            JSONObject tasksObject = new JSONObject(tasks);
+            tasksObject = tasksObject.getJSONObject("task-"+d+"-"+m+"-"+y);
+            tasksObject.remove(oldTask);
+            tasksObject.put(newTask, finished);
+            JSONObject wholePlanner = new JSONObject(tasks);
+            wholePlanner.put("task-"+d+"-"+m+"-"+y, tasksObject);
+            fileWriter.write(wholePlanner.toString());
+            fileWriter.flush();
+            fileWriter.close();
+            tasks = wholePlanner.toString();
+        }catch (Exception e) {
+        }
     }
 
     private static void FinishTask(String text, String filename, Context context, int d, int m, int y) throws IOException {

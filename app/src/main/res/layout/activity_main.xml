@@ -38,7 +38,7 @@
             android:layout_below="@+id/data"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp">
+            android:layout_marginRight="60dp">
             <RelativeLayout
                 android:id="@+id/relativeCheckboxes"
                 android:layout_width="match_parent"
